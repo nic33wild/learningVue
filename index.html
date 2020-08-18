@@ -7,11 +7,24 @@
     integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
     crossorigin="anonymous"
   />
+  <style>
+    [v-cloak] {
+      display: none;
+    }
+  </style>
 </head>
 <body>
   <div id="app">
     <div class="container">
-      <form class="mt-5">
+      <img
+        :src="imgSrc"
+        :title="imgOwner"
+        alt="Avatar github nic33wild"
+        class="mt-5"
+      />
+    </div>
+    <div class="container">
+      <form v-if="!submitted" class="mt-5">
         <div class="form-group">
           <label for="email">Email</label>
           <input
@@ -25,22 +38,33 @@
           Submit
         </button>
       </form>
+      <h2 v-else v-cloak class="mt-5">Thank you to submit!!!</h2>
     </div>
   </div>
 
   <!-- Vue CDN -->
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script>
+    var url = "https://api.github.com/users/nic33wild";
     var vm = new Vue({
       el: "#app",
       data: {
-        email: "nic33wild@gmail.com"
+        email: "nic33wild@gmail.com",
+        submitted: false,
+        imgSrc: "",
+        imgOwner: ""
       },
       methods: {
         process: function () {
-          alert("Submitted to " + this.email);
+          this.submitted = true;
         }
       }
+    });
+
+    axios.get(url).then(function (res) {
+      vm.imgSrc = res.data.avatar_url;
+      vm.imgOwner = "Avatar of " + res.data.login;
     });
   </script>
 </body>

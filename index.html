@@ -16,12 +16,16 @@
 <body>
   <div id="app">
     <div class="container">
-      <img
-        :src="imgSrc"
-        :title="imgOwner"
-        alt="Avatar github nic33wild"
-        class="mt-5"
-      />
+      <figure>
+        <img
+          :src="imgSrc"
+          :title="imgOwner"
+          alt="Avatar github nic33wild"
+          class="mt-5"
+          width="150px"
+        />
+        <figcaption>{{imgOwner}}</figcaption>
+      </figure>
     </div>
     <div class="container">
       <form v-if="!submitted" class="mt-5">
@@ -46,7 +50,6 @@
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script>
-    var url = "https://api.github.com/users/nic33wild";
     var vm = new Vue({
       el: "#app",
       data: {
@@ -55,16 +58,21 @@
         imgSrc: "",
         imgOwner: ""
       },
+      created: function () {
+        this.fetchGitHub();
+      },
       methods: {
         process: function () {
           this.submitted = true;
+        },
+        fetchGitHub: function () {
+          var url = "https://api.github.com/users/nic33wild";
+          axios.get(url).then(function (res) {
+            vm.imgSrc = res.data.avatar_url;
+            vm.imgOwner = "Avatar of " + res.data.login;
+          });
         }
       }
-    });
-
-    axios.get(url).then(function (res) {
-      vm.imgSrc = res.data.avatar_url;
-      vm.imgOwner = "Avatar of " + res.data.login;
     });
   </script>
 </body>

@@ -44,6 +44,34 @@
       </form>
       <h2 v-else v-cloak class="mt-5">Thank you to submit!!!</h2>
     </div>
+    <div class="container">
+      <div class="card mt-5">
+        <h2 class="card-header">nic33wild - GitHub Public Repositories</h2>
+        <table class="table table-striped">
+          <thead class="thead-light">
+            <th>#</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Remove</th>
+          </thead>
+          <tbody v-cloak>
+            <tr v-for="(a, index) in repositories" :key="a.node_id">
+              <td>{{index + 1}}</td>
+              <td>{{a.name}}</td>
+              <td>{{a.description}}</td>
+              <td>
+                <button @click="remove(index)" class="btn btn-warning">
+                  Remove
+                </button>
+              </td>
+            </tr>
+          </tbody>
+          <div class="m-3" v-cloak v-if="numRepositories > 0">
+            <p>showing {{numRepositories}} repositories</p>
+          </div>
+        </table>
+      </div>
+    </div>
   </div>
 
   <!-- Vue CDN -->
@@ -56,10 +84,17 @@
         email: "nic33wild@gmail.com",
         submitted: false,
         imgSrc: "",
-        imgOwner: ""
+        imgOwner: "",
+        repositories: ""
+      },
+      computed: {
+        numRepositories: function () {
+          return this.repositories.length;
+        }
       },
       created: function () {
         this.fetchGitHub();
+        this.fetchRepos();
       },
       methods: {
         process: function () {
@@ -71,6 +106,15 @@
             vm.imgSrc = res.data.avatar_url;
             vm.imgOwner = "Avatar of " + res.data.login;
           });
+        },
+        fetchRepos: function () {
+          var url = "https://api.github.com/users/nic33wild/repos";
+          axios.get(url).then(function (res) {
+            vm.repositories = res.data;
+          });
+        },
+        remove: function (index) {
+          this.repositories.splice(index, 1);
         }
       }
     });

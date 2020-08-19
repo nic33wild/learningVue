@@ -11,21 +11,141 @@
     [v-cloak] {
       display: none;
     }
+    .fly-away-leave-to,
+    .fly-away-enter {
+      transform: translateX(500px);
+      opacity: 0;
+    }
+    .fly-away-enter-active,
+    .fly-away-leave-active {
+      transition: all 0.5s ease;
+    }
+
+    .repos-list-leave-to,
+    .repos-list-enter {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    .repos-list-enter-active,
+    .repos-list-leave-active {
+      transition: all 1s linear;
+    }
+
+    .spin-enter-active {
+      animation: spin-steps 2s;
+    }
+    @keyframes spin-steps {
+      0% {
+        transform: scale(0);
+      }
+      50% {
+        transform: scale(0);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
   </style>
 </head>
 <body>
   <div id="app">
     <div class="container">
-      <figure>
-        <img
-          :src="imgSrc"
-          :title="imgOwner"
-          alt="Avatar github nic33wild"
-          class="mt-5"
-          width="150px"
-        />
-        <figcaption>{{imgOwner}}</figcaption>
-      </figure>
+      <div class="row justify-content-md-center">
+        <h1>List of my public repositories from GitHub</h1>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row justify-content-md-center">
+        <figure class="col-md-6">
+          <img
+            :src="imgSrc"
+            :title="imgOwner"
+            alt="Avatar github nic33wild"
+            class="mt-5"
+            width="150px"
+          />
+          <figcaption>{{imgOwner}}</figcaption>
+        </figure>
+        <p class="col-md-2 mt-5">
+          <?xml version="1.0" encoding="UTF-8"?>
+          <svg
+            version="1.1"
+            viewBox="0 0 261.76 226.69"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g transform="matrix(1.3333 0 0 -1.3333 -76.311 313.34)">
+              <g transform="translate(178.06 235.01)">
+                <path
+                  d="m0 0-22.669-39.264-22.669 39.264h-75.491l98.16-170.02 98.16 170.02z"
+                  fill="#41b883"
+                />
+              </g>
+              <g transform="translate(178.06 235.01)">
+                <path
+                  d="m0 0-22.669-39.264-22.669 39.264h-36.227l58.896-102.01 58.896 102.01z"
+                  fill="#34495e"
+                />
+              </g>
+            </g>
+          </svg>
+        </p>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="card mt-5">
+        <h2 class="card-header">
+          nic33wild
+          <transition name="spin" appear>
+            <span style="display: inline-block;">
+              GitHub Public Repositories
+            </span>
+          </transition>
+        </h2>
+
+        <transition name="fly-away">
+          <div class="m-3" v-cloak v-if="numRepositories > 0 && showSummary">
+            <p>showing {{numRepositories}} repositories</p>
+          </div>
+        </transition>
+        <div class="m-3">
+          <a href="#" @click="showSummary = !showSummary">Show/hide summary</a>
+        </div>
+
+        <table class="table table-striped">
+          <thead class="thead-light">
+            <th>#</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Created at</th>
+            <th>Remove</th>
+          </thead>
+          <tbody is="transition-group" tag="tbody" name="repos-list" v-cloak>
+            <!-- <tr
+              v-for="(a, index) in repositories"
+              :key="a.node_id"
+              :style="[getRowStyle(a), {color: 'blue'}]"
+              style="color: blue;"
+            > -->
+            <tr
+              v-for="(a, index) in repositories"
+              :key="a.node_id"
+              :style="getRowStyle(a)"
+              style="color: blue;"
+            >
+              <td>{{index + 1}}</td>
+              <td>{{a.name}}</td>
+              <td>{{a.description}}</td>
+              <td>{{getCreatedAt(a)}}</td>
+              <td>
+                <button @click="remove(index)" class="btn btn-warning">
+                  Remove
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
     <div class="container">
       <form v-if="!submitted" class="mt-5">
@@ -42,35 +162,9 @@
           Submit
         </button>
       </form>
-      <h2 v-else v-cloak class="mt-5">Thank you to submit!!!</h2>
-    </div>
-    <div class="container">
-      <div class="card mt-5">
-        <h2 class="card-header">nic33wild - GitHub Public Repositories</h2>
-        <table class="table table-striped">
-          <thead class="thead-light">
-            <th>#</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Remove</th>
-          </thead>
-          <tbody v-cloak>
-            <tr v-for="(a, index) in repositories" :key="a.node_id">
-              <td>{{index + 1}}</td>
-              <td>{{a.name}}</td>
-              <td>{{a.description}}</td>
-              <td>
-                <button @click="remove(index)" class="btn btn-warning">
-                  Remove
-                </button>
-              </td>
-            </tr>
-          </tbody>
-          <div class="m-3" v-cloak v-if="numRepositories > 0">
-            <p>showing {{numRepositories}} repositories</p>
-          </div>
-        </table>
-      </div>
+      <h2 v-else v-cloak class="mt-5">
+        THANK YOU for submitting!!! ( even if you submitted nothing :D )
+      </h2>
     </div>
   </div>
 
@@ -85,7 +179,8 @@
         submitted: false,
         imgSrc: "",
         imgOwner: "",
-        repositories: ""
+        repositories: "",
+        showSummary: true
       },
       computed: {
         numRepositories: function () {
@@ -110,11 +205,29 @@
         fetchRepos: function () {
           var url = "https://api.github.com/users/nic33wild/repos";
           axios.get(url).then(function (res) {
-            vm.repositories = res.data;
+            let orderedRepos = res.data.sort(function (a, b) {
+              return new Date(b.created_at) - new Date(a.created_at);
+            });
+            vm.repositories = orderedRepos;
           });
         },
         remove: function (index) {
           this.repositories.splice(index, 1);
+        },
+        getCreatedAt: function (a) {
+          let formattedData = new Date(a.created_at).toLocaleDateString(
+            "DDMMYYYY"
+          );
+          return formattedData;
+        },
+        getRowStyle: function (a) {
+          if (a.name === "learningVue") {
+            return {
+              border: "solid 5px blue",
+              backgroundColor: "green",
+              color: "yellow"
+            };
+          }
         }
       }
     });

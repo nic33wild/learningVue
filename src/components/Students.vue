@@ -7,11 +7,11 @@
       <v-list>
         <v-list-tile
           v-bind:key="student"
-          v-for="(student, index) in students"
+          v-for="(student, index) in $store.getters.students"
           :to="'editStudent/' + index"
         >
           <v-list-tile-content>
-            <v-list-tile-title v-text="student.name"></v-list-tile-title>
+            <v-list-tile-title v-text="student.fullName"></v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>

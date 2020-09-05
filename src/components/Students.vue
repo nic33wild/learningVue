@@ -5,7 +5,11 @@
         <v-toolbar-title>Students</v-toolbar-title>
       </v-toolbar>
       <v-list>
-        <v-list-tile v-for="(student, index) in students" :to="'editStudent/' + index">
+        <v-list-tile
+          v-bind:key="student"
+          v-for="(student, index) in students"
+          :to="'editStudent/' + index"
+        >
           <v-list-tile-content>
             <v-list-tile-title v-text="student.name"></v-list-tile-title>
           </v-list-tile-content>
@@ -17,15 +21,15 @@
 
 <script>
 import axios from "axios";
+import { mapState } from "vuex";
 
 export default {
   data() {
-    return {
-      students: [],
-    };
+    return {};
   },
-  async created() {
-    this.students = (await axios.get("http://localhost:3000/students")).data;
-  },
+  computed: mapState({
+    students: state => state.students
+  }),
+  async created() {}
 };
 </script>
